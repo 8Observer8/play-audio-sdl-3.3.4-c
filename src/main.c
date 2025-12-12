@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_mixer/SDL_mixer.h>
+#include <stdio.h>
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -24,7 +25,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
 
     // --- Create window and renderer ---
     const char *title = "Play a sound by click using SDL3 C";
-    if (!SDL_CreateWindowAndRenderer(title, 380, 380, 0, &window, &renderer))
+    if (!SDL_CreateWindowAndRenderer(title, 300, 300, 0, &window, &renderer))
     {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
@@ -33,13 +34,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
     SDL_SetRenderVSync(renderer, 1);
 
     // --- Print SDL versions ---
-    SDL_Log("Compiled SDL version: %d.%d.%d",
+    printf("Compiled SDL version: %d.%d.%d\n",
         SDL_MAJOR_VERSION,
         SDL_MINOR_VERSION,
         SDL_MICRO_VERSION);
     // Get the version of the SDL library linked at runtime
     int v = SDL_GetVersion();
-    SDL_Log("Linked SDL3 version:  %d.%d.%d", SDL_VERSIONNUM_MAJOR(v),
+    printf("Linked SDL3 version:  %d.%d.%d\n", SDL_VERSIONNUM_MAJOR(v),
         SDL_VERSIONNUM_MINOR(v), SDL_VERSIONNUM_MICRO(v));
 
     // --- SDL3_mixer version ---
@@ -47,7 +48,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
     int major = SDL_VERSIONNUM_MAJOR(v);
     int minor = SDL_VERSIONNUM_MINOR(v);
     int micro = SDL_VERSIONNUM_MICRO(v);
-    SDL_Log("SDL3_mixer version:   %d.%d.%d", major, minor, micro);
+    printf("SDL3_mixer version:   %d.%d.%d\n", major, minor, micro);
 
     // --- Init mixer ---
     if (!MIX_Init())
@@ -66,28 +67,28 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
     // --- Print mixer spec ---
     SDL_AudioSpec mspec;
     MIX_GetMixerFormat(mixer, &mspec);
-    SDL_Log("Mixer format: %s, %d channels, %d Hz",
+    printf("Mixer format: %s, %d channels, %d Hz\n",
         SDL_GetAudioFormatName(mspec.format),
         mspec.channels,
         mspec.freq);
 
     // --- Print available decoders ---
-    SDL_Log("Available MIXER decoders:");
+    printf("Available MIXER decoders:\n");
 
     int ndec = MIX_GetNumAudioDecoders();
     if (ndec < 0)
     {
-        SDL_Log(" - [error: %s]", SDL_GetError());
+        printf(" - [error: %s]\n", SDL_GetError());
     }
     else if (ndec == 0)
     {
-        SDL_Log(" - [none]");
+        printf(" - [none]\n");
     }
     else
     {
         for (int i = 0; i < ndec; i++)
         {
-            SDL_Log(" - %s", MIX_GetAudioDecoder(i));
+            printf(" - %s\n", MIX_GetAudioDecoder(i));
         }
     }
 
@@ -104,7 +105,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
         SDL_AudioSpec aspec;
         MIX_GetAudioFormat(audio, &aspec);
 
-        SDL_Log("%s: %s, %d channel%s, %d Hz",
+        printf("%s: %s, %d channel%s, %d Hz\n",
             audiofile,
             SDL_GetAudioFormatName(aspec.format),
             aspec.channels,
@@ -112,7 +113,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
             aspec.freq);
     }
 
-    return SDL_APP_CONTINUE; // continue running
+    return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
